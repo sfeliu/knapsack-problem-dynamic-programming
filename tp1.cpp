@@ -112,8 +112,16 @@ vector<int> get_sum_parts_with_poda(vector<int> numbers, int parts, int value, b
 	return sum_parts;
 }
 
+void print_lista(vector<vector<int>> lista){
+	cout << "Lista parcial.." << endl << "[";
+	for(int i=0; i<lista.size(); i++){
+		cout << lista[i][0] << ", ";
+	}
+	cout << "]" << endl;
+}
 
-vector<vector<int>> solveBacktracking(vector<int> numbers, int &cantIteraciones, int expected, int cardinal){
+
+vector<vector<int>> solveBacktracking(vector<int> numbers, int &cantIteraciones, int expected, int &cardinal){
 	if(numbers.size() == 0){
 		if(expected == 0){
 			cardinal = 0;
@@ -128,18 +136,22 @@ vector<vector<int>> solveBacktracking(vector<int> numbers, int &cantIteraciones,
 	}else{
 		int first_number = numbers[0];
 		numbers.erase(numbers.begin());
-		vector<vector<int>> partial_sums = solveFuerzaBruta(numbers, cantIteraciones);
+		vector<vector<int>> partial_sums = solveBacktracking(numbers, cantIteraciones, expected, cardinal);
+		print_lista(partial_sums);
 		int size = partial_sums.size();
-		vector<int> partial_sum;
 		for(int i=0; i<size; i++){
-			partial_sum.clear();
+			vector<int> partial_sum;
+			cout << "Primer numero " << first_number << " sumando al proximo " << partial_sums[i][0] << endl;
 			partial_sum.push_back(first_number + partial_sums[i][0]);
 			partial_sum.push_back(partial_sums[i][1] + 1);
-			if(partial_sum[0] < expected and partial_sum[0] != 0 and partial_sum[1] < cardinal){
-				partial_sum.push_back(partial_sum[0]);
-				partial_sum.push_back(partial_sum[1]);
+			if(partial_sum[0] < expected and first_number != 0 and partial_sum[1] < cardinal){
+				cout << "Entre con " << partial_sum[0] << endl;
+				//partial_sum.push_back(partial_sum[0]);
+				//partial_sum.push_back(partial_sum[1]);
 				partial_sums.push_back(partial_sum);
+				//cout << partial_sums[0][0];
 			}else if(partial_sum[0] == expected){
+				cout << "Encontre el valor esperado" << endl;
 				cardinal = partial_sum[1];
 			}
 			cantIteraciones++;
