@@ -1,4 +1,4 @@
-
+#include <fstream>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -208,17 +208,23 @@ int backtracking2(vector<int> &numbers, int expected){
 }
 
 
-int main(){
+int main(int argc, char *argv[]){
+	if(argc < 2){
+		cout << "Missing file parameter...";
+		return -1;
+	}
+	ifstream infile;
+	infile.open(argv[1]);
 	int vector_size, searching_value;
 	bool encontre;
-	cin >> vector_size >> searching_value;
+	infile >> vector_size >> searching_value;
 	vector<int> numbers;
 	int number;
-	for(int i = 0; i < vector_size; i++){
-		cin >> number;
+	for(int i = 0; i < vector_size && infile; i++){
+		infile >> number;
 		numbers.push_back(number);
 	}
-
+	infile.close();
 	cout << "Your vector is:" << endl;
 	for(int i = 0; i < vector_size; i++){
 		cout << numbers[i] << " ";
