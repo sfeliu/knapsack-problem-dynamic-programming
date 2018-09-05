@@ -137,21 +137,21 @@ vector<vector<int>> solveBacktracking(vector<int> numbers, int &cantIteraciones,
 		int first_number = numbers[0];
 		numbers.erase(numbers.begin());
 		vector<vector<int>> partial_sums = solveBacktracking(numbers, cantIteraciones, expected, cardinal);
-		print_lista(partial_sums);
+		//print_lista(partial_sums);
 		int size = partial_sums.size();
 		for(int i=0; i<size; i++){
 			vector<int> partial_sum;
-			cout << "Primer numero " << first_number << " sumando al proximo " << partial_sums[i][0] << endl;
+			//cout << "Primer numero " << first_number << " sumando al proximo " << partial_sums[i][0] << endl;
 			partial_sum.push_back(first_number + partial_sums[i][0]);
 			partial_sum.push_back(partial_sums[i][1] + 1);
 			if(partial_sum[0] < expected and first_number != 0 and partial_sum[1] < cardinal){
-				cout << "Entre con " << partial_sum[0] << endl;
+				//cout << "Entre con " << partial_sum[0] << endl;
 				//partial_sum.push_back(partial_sum[0]);
 				//partial_sum.push_back(partial_sum[1]);
 				partial_sums.push_back(partial_sum);
 				//cout << partial_sums[0][0];
 			}else if(partial_sum[0] == expected){
-				cout << "Encontre el valor esperado" << endl;
+				//cout << "Encontre el valor esperado" << endl;
 				cardinal = partial_sum[1];
 			}
 			cantIteraciones++;
@@ -163,6 +163,29 @@ vector<vector<int>> solveBacktracking(vector<int> numbers, int &cantIteraciones,
 }
 
 
+vector<int> solveProgDinamica(vector<int> numbers, int &cantIteraciones, int expected){
+	vector<int> actual_line;
+	vector<int> previous_line;
+	previous_line.push_back(0);
+	for(int i=1; i<=expected; i++){
+		previous_line.push_back(numbers.size()+1);
+	}
+	for(int i=0; i<numbers.size(); i++){
+		for(int j=0; j<=expected; j++){
+			if(numbers[i] > j){
+				actual_line.push_back(previous_line[j]);
+			}else{
+				actual_line.push_back(min(previous_line[j], 1 + previous_line[j - numbers[i]]));
+			}
+			cantIteraciones ++;
+		}
+	previous_line = actual_line;
+	actual_line.clear();
+	}
+	return previous_line;
+}
+
+
 int fuerzaBruta2(vector<int> &numbers, int expected){
 	int cantIteraciones = 0;
 	vector<vector<int>> all_possible_sums = solveFuerzaBruta(numbers, cantIteraciones);
@@ -171,6 +194,7 @@ int fuerzaBruta2(vector<int> &numbers, int expected){
 		if(all_possible_sums[i][0] == expected && all_possible_sums[i][1] < lowest_cardinal){
 			lowest_cardinal = all_possible_sums[i][1];
 		}
+		cantIteraciones++;
 	}
 	cout << endl << endl << "Solucion encontrada despues de: " << cantIteraciones << " iteraciones" << endl;
 	if(lowest_cardinal == numbers.size() + 1){
@@ -220,6 +244,19 @@ int backtracking2(vector<int> &numbers, int expected){
 }
 
 
+
+int progDinamica(vector<int> &numbers, int expected){
+	int cantIteraciones = 0;
+	vector<int> last_row = solveProgDinamica(numbers, cantIteraciones, expected);
+	cout << endl << endl << "Solucion encontrada despues de: " << cantIteraciones << " iteraciones" << endl;
+	if(last_row[expected] == numbers.size() + 1){
+		last_row[expected] = -1;
+	}
+	return last_row[expected];
+}
+
+
+
 int main(int argc, char *argv[]){
 	if(argc < 2){
 		cout << "Missing file parameter...";
@@ -258,16 +295,19 @@ int main(int argc, char *argv[]){
     cout << chrono::steady_clock::period::den << endl;
     cout << "steady = " << boolalpha << chrono::steady_clock::is_steady << endl << endl;
 
-
+    int cardinal;
+    
+    /*
     cout << endl << endl;
     auto startFuerzaBruta = chrono::steady_clock::now();
-	int cardinal = fuerzaBruta(numbers, searching_value);
+	cardinal = fuerzaBruta(numbers, searching_value);
 	cout << cardinal;
 	cout<<endl;
     auto endFuerzaBruta = chrono::steady_clock::now();
     auto diffFuerzaBruta = endFuerzaBruta - startFuerzaBruta;
     cout << "Tiempo utilizado por Fuerza bruta " << chrono::duration <double, milli> (diffFuerzaBruta).count() << " ms" << endl;
-
+	*/
+	
     cout << endl << endl;
     auto startFuerzaBruta2 = chrono::steady_clock::now();
 	cardinal = fuerzaBruta2(numbers, searching_value);
@@ -278,6 +318,7 @@ int main(int argc, char *argv[]){
     cout << "Tiempo utilizado por True Fuerza bruta " << chrono::duration <double, milli> (diffFuerzaBruta2).count() << " ms" << endl;
 
 
+    /*
     cout << endl << endl;
     auto startBackTracking = chrono::steady_clock::now();
 	cardinal = backtracking(numbers, searching_value);
@@ -286,6 +327,7 @@ int main(int argc, char *argv[]){
     auto endBackTracking = chrono::steady_clock::now();
     auto diffBackTracking = endBackTracking - startBackTracking;
     cout << "Tiempo utilizado por Back Tracking " << chrono::duration <double, milli> (diffBackTracking).count() << " ms" << endl;
+	*/
 
 
     cout << endl << endl;
@@ -296,5 +338,15 @@ int main(int argc, char *argv[]){
     auto endBackTracking2 = chrono::steady_clock::now();
     auto diffBackTracking2 = endBackTracking2 - startBackTracking2;
     cout << "Tiempo utilizado por True Back Tracking " << chrono::duration <double, milli> (diffBackTracking2).count() << " ms" << endl;
+
+
+    cout << endl << endl;
+    auto startProgDinamica = chrono::steady_clock::now();
+	cardinal = progDinamica(numbers, searching_value);
+	cout << cardinal;
+	cout<<endl;
+    auto endProgDinamica = chrono::steady_clock::now();
+    auto diffProgDinamica = endProgDinamica - startProgDinamica;
+    cout << "Tiempo utilizado por Programacion Dinamica " << chrono::duration <double, milli> (diffProgDinamica).count() << " ms" << endl;
     
 }
